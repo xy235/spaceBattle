@@ -5,4 +5,4 @@ node_modules
 build
 
 #dbService
-./server/db.service.js
+./server/db.config.json
