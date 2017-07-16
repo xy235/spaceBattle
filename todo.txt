@@ -1,0 +1,43 @@
+IN PROGRESS
+login
+	DONE nainstalovat nejaku db
+	DONE vytvorit db schemu
+	spravit prihlasovanie
+	
+boti
+	DONE spomalit strielanie
+	umoznit botovi zabit bota
+	
+roomky
+	DONE pridanie hraca do roomky
+	DONE vyhodenie hraca z roomky
+	preposielanie sprav iba v ramci roomky
+	
+TODO
+fixnut velkost hitboxu lodky/strely
+
+
+MAYBE
+stit
+oddialit kameru podla rychlosti
+pick ups
+rozne druhy zbrani
+timelimit
+
+DONE
+buh vi kedy
+	vyhadzovat odpojenych hracov
+	pocitat score hracom
+		dorobit posielanie socketom v take damage v player.factory.js a pokracovat dalej
+	zobrazovat score
+28.2.2016
+	posielat aj playerov speed
+	random spawn
+	fixnut pocet zivotov
+	cuvanie
+	hrac obcas dostane dva body za jeden kill
+14.5.2017
+	zaciatok a koniec hry
+		koniec
+			fraglimit
+	killnut vsetkym hru

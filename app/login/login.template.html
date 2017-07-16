@@ -1,0 +1,19 @@
+<div ng-controller="loginController as vm" class="container">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form>
+                <div class="form-group">
+                    <label>Login/email:</label>
+                    <input type="text" class="form-control" ng-model="vm.name"></input>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" class="form-control" ng-model="vm.password"></input>
+                </div>
+                <button class="button" ng-click="vm.login(vm.name, vm.password)">Sign in</button>
+            </form>
+
+            <button ng-click="vm.fbLogin()">Login with Facebook</button>
+        </div>
+    </div>
+</div>
