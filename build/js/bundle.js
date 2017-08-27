@@ -24,7 +24,7 @@ function Factory() {
     return config;
 }
 
-},{"angular":21}],2:[function(require,module,exports){
+},{"angular":22}],2:[function(require,module,exports){
 'use strict';
 
 var _angular = require('angular');
@@ -45,7 +45,7 @@ _angular2.default.element(document).ready(function () {
   _angular2.default.bootstrap(document.querySelector('html'), [_appPackage2.default.name], { strictDi: false });
 });
 
-},{"./app.package.js":3,"angular":21}],3:[function(require,module,exports){
+},{"./app.package.js":3,"angular":22}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -88,6 +88,8 @@ var _gameStatesConstant = require('./game-states.constant.js');
 
 var _gameStatesConstant2 = _interopRequireDefault(_gameStatesConstant);
 
+require('./templates.js');
+
 function _interopRequireDefault(obj) {
 	return obj && obj.__esModule ? obj : { default: obj };
 }
@@ -95,9 +97,10 @@ function _interopRequireDefault(obj) {
 var angular = require('angular');
 var angularResourceModule = require('angular-resource');
 
-exports.default = angular.module('appModule', [angularResourceModule, _appConfig2.default.name, _appRoutes2.default.name, _loginPackage2.default.name, _gameController2.default.name, _socketFactory2.default.name, _phaserFactory2.default.name, _playerFactory2.default.name, _gameStateService2.default.name, _gameStatesConstant2.default.name]);
+//cached html templates
+exports.default = angular.module('appModule', ['templates', angularResourceModule, _appConfig2.default.name, _appRoutes2.default.name, _loginPackage2.default.name, _gameController2.default.name, _socketFactory2.default.name, _phaserFactory2.default.name, _playerFactory2.default.name, _gameStateService2.default.name, _gameStatesConstant2.default.name]);
 
-},{"./app.config.js":1,"./app.routes.js":4,"./game-state.service.js":5,"./game-states.constant.js":6,"./game.controller.js":7,"./login/login.package.js":10,"./phaser.factory.js":12,"./player.factory.js":13,"./socket.factory.js":14,"angular":21,"angular-resource":17}],4:[function(require,module,exports){
+},{"./app.config.js":1,"./app.routes.js":4,"./game-state.service.js":5,"./game-states.constant.js":6,"./game.controller.js":7,"./login/login.package.js":10,"./phaser.factory.js":12,"./player.factory.js":13,"./socket.factory.js":14,"./templates.js":15,"angular":22,"angular-resource":18}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -118,16 +121,16 @@ exports.default = _angular2.default.module('appRoutesModule', ['ngRoute']).confi
   'use strict';
 
   $routeProvider.when('/game', {
-    templateUrl: 'app/game.html'
+    templateUrl: 'game.html'
   }).when('/login', {
-    templateUrl: 'app/login/login.template.html'
+    templateUrl: 'login/login.template.html'
   }).otherwise({
     redirectTo: '/'
   });
   $locationProvider.html5Mode(false);
 }]);
 
-},{"angular":21,"angular-route":19}],5:[function(require,module,exports){
+},{"angular":22,"angular-route":20}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -303,6 +306,10 @@ function GameController($window, $scope, $http, pha, socket, playerFactory, game
     //game size
     vm.game.world.setBounds(0, 0, 1920, 1080);
 
+    //if(vm.isMobile) {
+    initMobile();
+    //}
+
     //config
     vm.game.time.advancedTiming = true;
 
@@ -329,6 +336,15 @@ function GameController($window, $scope, $http, pha, socket, playerFactory, game
     //game state
     gameStateService.init(vm.game);
     vm.gameObjects.gameStateText = gameStateService.gameStateText;
+  }
+
+  function initMobile() {
+    //game scale
+    // make the game occuppy all available space, but respecting
+    // aspect ratio – with letterboxing if needed
+    vm.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    vm.game.scale.pageAlignHorizontally = true;
+    vm.game.scale.pageAlignVertically = true;
   }
 
   function update() {
@@ -603,7 +619,7 @@ function GameController($window, $scope, $http, pha, socket, playerFactory, game
   }
 }
 
-},{"angular":21}],8:[function(require,module,exports){
+},{"angular":22}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -663,7 +679,7 @@ function Controller(authentication) {
     return vm;
 }
 
-},{"angular":21}],10:[function(require,module,exports){
+},{"angular":22}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -722,7 +738,7 @@ function phaserFactory() {
   return Phaser;
 }
 
-},{"angular":21}],13:[function(require,module,exports){
+},{"angular":22}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -861,7 +877,7 @@ function PlayerFactory(pha, socket) {
 	}
 }
 
-},{"angular":21}],14:[function(require,module,exports){
+},{"angular":22}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -898,7 +914,15 @@ function socketFactory($rootScope) {
   };
 }
 
-},{"angular":21,"socket.io-client":55}],15:[function(require,module,exports){
+},{"angular":22,"socket.io-client":56}],15:[function(require,module,exports){
+'use strict';
+
+angular.module('templates', []).run(['$templateCache', function ($templateCache) {
+  $templateCache.put('game.html', '<div ng-controller="GameController as vm">\r\n\t<div ng-show="vm.name==\' \'">\r\n\t\t<h1>Choose a nick name</h1>\r\n\t\t<div class=col-sm-10>\r\n\t\t\t<input ng-keypress="vm.fieldSetName()" ng-model="vm.tempName" class="form-control" autocomplete="off" />\r\n\t\t</div>\r\n\t\t<div class=col-sm-2>\r\n\t\t\t<button class="btn btn-default" ng-click="vm.setName()">Save</button>\r\n\t\t</div>\r\n\t\t<div class=col-sm-12>\r\n\t\t\t<table>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\tRooms\r\n\t\t\t\t\t</th>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr ng-repeat="room in vm.rooms">\r\n\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t{{room.name}}\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<div ng-show="vm.name!=\' \'">\r\n\t\t<div ng-class="{\'col-xs-6\': !vm.isMobile"}>\r\n\t\t\t<h1 ng-if="!vm.isMobile">Game</h1>\r\n\t\t\t<div style="border: 1px solid black; width: 100%" id="gameCanvas"></div>\r\n\t\t</div>\r\n\t\t<div ng-if="vm.isMobile">\r\n\t\t\t<button><</button>\r\n\t\t\t<button>></button>\r\n\t\t</div>\r\n\r\n\t\t<div ng-if="!vm.isMobile" class=col-xs-6>\r\n\t\t\t<h1>Chat</h1>\r\n\t\t\t<ul class="list-group">\r\n\t\t\t\t<li class="list-group-item" ng-repeat="message in vm.messages track by $index">{{message}}</li>\r\n\t\t\t</ul>\r\n\r\n\t\t\t<div>\r\n\t\t\t\t<div class=col-sm-10>\r\n\t\t\t\t\t<input ng-model="vm.textMessage" ng-keypress="vm.fieldSend()" class="form-control" autocomplete="off" />\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=col-sm-2>\r\n\t\t\t\t\t<button class="btn btn-default" ng-click="vm.send()">Send</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>');
+  $templateCache.put('login/login.template.html', '<div ng-controller="loginController as vm" class="container">\r\n    <div class="panel panel-default">\r\n        <div class="panel-body">\r\n            <form>\r\n                <div class="form-group">\r\n                    <label>Login/email:</label>\r\n                    <input type="text" class="form-control" ng-model="vm.name"></input>\r\n                </div>\r\n                <div class="form-group">\r\n                    <label>Password:</label>\r\n                    <input type="password" class="form-control" ng-model="vm.password"></input>\r\n                </div>\r\n                <button class="button" ng-click="vm.login(vm.name, vm.password)">Sign in</button>\r\n            </form>\r\n\r\n            <button ng-click="vm.fbLogin()">Login with Facebook</button>\r\n        </div>\r\n    </div>\r\n</div>');
+}]);
+
+},{}],16:[function(require,module,exports){
 module.exports = after
 
 function after(count, callback, err_cb) {
@@ -928,9 +952,9 @@ function after(count, callback, err_cb) {
 
 function noop() {}
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
- * @license AngularJS v1.6.5
+ * @license AngularJS v1.6.6
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -1128,7 +1152,12 @@ function shallowClearAndCopy(src, dst) {
  *     [requestType](https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest#responseType).
  *   - **`interceptor`** - `{Object=}` - The interceptor object has two optional methods -
  *     `response` and `responseError`. Both `response` and `responseError` interceptors get called
- *     with `http response` object. See {@link ng.$http $http interceptors}.
+ *     with `http response` object. See {@link ng.$http $http interceptors}. In addition, the
+ *     resource instance or array object is accessible by the `resource` property of the
+ *     `http response` object.
+ *     Keep in mind that the associated promise will be resolved with the value returned by the
+ *     response interceptor, if one is specified. The default response interceptor returns
+ *     `response.resource` (i.e. the resource instance or array).
  *   - **`hasBody`** - `{boolean}` - allows to specify if a request body should be included or not.
  *     If not specified only POST, PUT and PATCH requests will have a body.
  *
@@ -1203,8 +1232,7 @@ function shallowClearAndCopy(src, dst) {
  *     {@link ngRoute.$routeProvider resolve section of $routeProvider.when()} to defer view
  *     rendering until the resource(s) are loaded.
  *
- *     On failure, the promise is rejected with the {@link ng.$http http response} object, without
- *     the `resource` property.
+ *     On failure, the promise is rejected with the {@link ng.$http http response} object.
  *
  *     If an interceptor object was provided, the promise will instead be resolved with the value
  *     returned by the interceptor.
@@ -1373,7 +1401,7 @@ function shallowClearAndCopy(src, dst) {
  *
  */
 angular.module('ngResource', ['ng']).
-  info({ angularVersion: '1.6.5' }).
+  info({ angularVersion: '1.6.6' }).
   provider('$resource', function ResourceProvider() {
     var PROTOCOL_AND_IPV6_REGEX = /^https?:\/\/\[[^\]]*][^/]*/;
 
@@ -1424,7 +1452,7 @@ angular.module('ngResource', ['ng']).
      *       $resourceProvider.defaults.actions.update = {
      *         method: 'PUT'
      *       };
-     *     });
+     *     }]);
      * ```
      *
      * Or you can even overwrite the whole `actions` list and specify your own:
@@ -1712,6 +1740,9 @@ angular.module('ngResource', ['ng']).
               response.resource = value;
 
               return response;
+            }, function(response) {
+              response.resource = value;
+              return $q.reject(response);
             });
 
             promise = promise['finally'](function() {
@@ -1759,7 +1790,9 @@ angular.module('ngResource', ['ng']).
 
             function cancelRequest(value) {
               promise.catch(noop);
-              timeoutDeferred.resolve(value);
+              if (timeoutDeferred !== null) {
+                timeoutDeferred.resolve(value);
+              }
             }
           };
 
@@ -1788,13 +1821,13 @@ angular.module('ngResource', ['ng']).
 
 })(window, window.angular);
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 require('./angular-resource');
 module.exports = 'ngResource';
 
-},{"./angular-resource":16}],18:[function(require,module,exports){
+},{"./angular-resource":17}],19:[function(require,module,exports){
 /**
- * @license AngularJS v1.6.5
+ * @license AngularJS v1.6.6
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -1854,7 +1887,7 @@ var noop;
 /* global -ngRouteModule */
 var ngRouteModule = angular.
   module('ngRoute', []).
-  info({ angularVersion: '1.6.5' }).
+  info({ angularVersion: '1.6.6' }).
   provider('$route', $RouteProvider).
   // Ensure `$route` will be instantiated in time to capture the initial `$locationChangeSuccess`
   // event (unless explicitly disabled). This is necessary in case `ngView` is included in an
@@ -3023,13 +3056,13 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 
 })(window, window.angular);
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 require('./angular-route');
 module.exports = 'ngRoute';
 
-},{"./angular-route":18}],20:[function(require,module,exports){
+},{"./angular-route":19}],21:[function(require,module,exports){
 /**
- * @license AngularJS v1.6.5
+ * @license AngularJS v1.6.6
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -3136,7 +3169,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message += '\nhttp://errors.angularjs.org/1.6.5/' +
+    message += '\nhttp://errors.angularjs.org/1.6.6/' +
       (module ? module + '/' : '') + code;
 
     for (i = 0, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -5814,11 +5847,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.6.5',
+  full: '1.6.6',
   major: 1,
   minor: 6,
-  dot: 5,
-  codeName: 'toffee-salinization'
+  dot: 6,
+  codeName: 'interdimensional-cable'
 };
 
 
@@ -5964,7 +5997,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.6.5' });
+  .info({ angularVersion: '1.6.6' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -11526,6 +11559,31 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     return preAssignBindingsEnabled;
   };
 
+  /**
+   * @ngdoc method
+   * @name  $compileProvider#strictComponentBindingsEnabled
+   *
+   * @param {boolean=} enabled update the strictComponentBindingsEnabled state if provided, otherwise just return the
+   * current strictComponentBindingsEnabled state
+   * @returns {*} current value if used as getter or itself (chaining) if used as setter
+   *
+   * @kind function
+   *
+   * @description
+   * Call this method to enable/disable strict component bindings check. If enabled, the compiler will enforce that
+   * for all bindings of a component that are not set as optional with `?`, an attribute needs to be provided
+   * on the component's HTML tag.
+   *
+   * The default value is false.
+   */
+  var strictComponentBindingsEnabled = false;
+  this.strictComponentBindingsEnabled = function(enabled) {
+    if (isDefined(enabled)) {
+      strictComponentBindingsEnabled = enabled;
+      return this;
+    }
+    return strictComponentBindingsEnabled;
+  };
 
   var TTL = 10;
   /**
@@ -13553,12 +13611,20 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       }
     }
 
+    function strictBindingsCheck(attrName, directiveName) {
+      if (strictComponentBindingsEnabled) {
+        throw $compileMinErr('missingattr',
+          'Attribute \'{0}\' of \'{1}\' is non-optional and must be set!',
+          attrName, directiveName);
+      }
+    }
 
     // Set up $watches for isolate scope and controller bindings.
     function initializeDirectiveBindings(scope, attrs, destination, bindings, directive) {
       var removeWatchCollection = [];
       var initialChanges = {};
       var changes;
+
       forEach(bindings, function initializeBinding(definition, scopeName) {
         var attrName = definition.attrName,
         optional = definition.optional,
@@ -13570,7 +13636,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
           case '@':
             if (!optional && !hasOwnProperty.call(attrs, attrName)) {
+              strictBindingsCheck(attrName, directive.name);
               destination[scopeName] = attrs[attrName] = undefined;
+
             }
             removeWatch = attrs.$observe(attrName, function(value) {
               if (isString(value) || isBoolean(value)) {
@@ -13597,6 +13665,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           case '=':
             if (!hasOwnProperty.call(attrs, attrName)) {
               if (optional) break;
+              strictBindingsCheck(attrName, directive.name);
               attrs[attrName] = undefined;
             }
             if (optional && !attrs[attrName]) break;
@@ -13641,6 +13710,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           case '<':
             if (!hasOwnProperty.call(attrs, attrName)) {
               if (optional) break;
+              strictBindingsCheck(attrName, directive.name);
               attrs[attrName] = undefined;
             }
             if (optional && !attrs[attrName]) break;
@@ -13666,6 +13736,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             break;
 
           case '&':
+            if (!optional && !hasOwnProperty.call(attrs, attrName)) {
+              strictBindingsCheck(attrName, directive.name);
+            }
             // Don't assign Object.prototype method to scope
             parentGet = attrs.hasOwnProperty(attrName) ? $parse(attrs[attrName]) : noop;
 
@@ -14198,7 +14271,7 @@ function $HttpParamSerializerProvider() {
       if (!params) return '';
       var parts = [];
       forEachSorted(params, function(value, key) {
-        if (value === null || isUndefined(value)) return;
+        if (value === null || isUndefined(value) || isFunction(value)) return;
         if (isArray(value)) {
           forEach(value, function(v) {
             parts.push(encodeUriQuery(key)  + '=' + encodeUriQuery(serializeValue(v)));
@@ -14294,10 +14367,15 @@ function defaultHttpResponseTransform(data, headers) {
 
     if (tempData) {
       var contentType = headers('Content-Type');
-      if ((contentType && (contentType.indexOf(APPLICATION_JSON) === 0)) || isJsonLike(tempData)) {
+      var hasJsonContentType = contentType && (contentType.indexOf(APPLICATION_JSON) === 0);
+
+      if (hasJsonContentType || isJsonLike(tempData)) {
         try {
           data = fromJson(tempData);
         } catch (e) {
+          if (!hasJsonContentType) {
+            return data;
+          }
           throw $httpMinErr('baddata', 'Data must be a valid JSON object. Received: "{0}". ' +
           'Parse error: "{1}"', data, e);
         }
@@ -14610,6 +14688,7 @@ function $HttpProvider() {
      *   - **headers** – `{function([headerName])}` – Header getter function.
      *   - **config** – `{Object}` – The configuration object that was used to generate the request.
      *   - **statusText** – `{string}` – HTTP status text of the response.
+     *   - **xhrStatus** – `{string}` – Status of the XMLHttpRequest (`complete`, `error`, `timeout` or `abort`).
      *
      * A response status code between 200 and 299 is considered a success status and will result in
      * the success callback being called. Any response status code outside of that range is
@@ -15451,9 +15530,9 @@ function $HttpProvider() {
           } else {
             // serving from cache
             if (isArray(cachedResp)) {
-              resolvePromise(cachedResp[1], cachedResp[0], shallowCopy(cachedResp[2]), cachedResp[3]);
+              resolvePromise(cachedResp[1], cachedResp[0], shallowCopy(cachedResp[2]), cachedResp[3], cachedResp[4]);
             } else {
-              resolvePromise(cachedResp, 200, {}, 'OK');
+              resolvePromise(cachedResp, 200, {}, 'OK', 'complete');
             }
           }
         } else {
@@ -15510,10 +15589,10 @@ function $HttpProvider() {
        *  - resolves the raw $http promise
        *  - calls $apply
        */
-      function done(status, response, headersString, statusText) {
+      function done(status, response, headersString, statusText, xhrStatus) {
         if (cache) {
           if (isSuccess(status)) {
-            cache.put(url, [status, response, parseHeaders(headersString), statusText]);
+            cache.put(url, [status, response, parseHeaders(headersString), statusText, xhrStatus]);
           } else {
             // remove promise from the cache
             cache.remove(url);
@@ -15521,7 +15600,7 @@ function $HttpProvider() {
         }
 
         function resolveHttpPromise() {
-          resolvePromise(response, status, headersString, statusText);
+          resolvePromise(response, status, headersString, statusText, xhrStatus);
         }
 
         if (useApplyAsync) {
@@ -15536,7 +15615,7 @@ function $HttpProvider() {
       /**
        * Resolves the raw $http promise.
        */
-      function resolvePromise(response, status, headers, statusText) {
+      function resolvePromise(response, status, headers, statusText, xhrStatus) {
         //status: HTTP response status code, 0, -1 (aborted by timeout / promise)
         status = status >= -1 ? status : 0;
 
@@ -15545,12 +15624,13 @@ function $HttpProvider() {
           status: status,
           headers: headersGetter(headers),
           config: config,
-          statusText: statusText
+          statusText: statusText,
+          xhrStatus: xhrStatus
         });
       }
 
       function resolvePromiseWithResult(result) {
-        resolvePromise(result.data, result.status, shallowCopy(result.headers()), result.statusText);
+        resolvePromise(result.data, result.status, shallowCopy(result.headers()), result.statusText, result.xhrStatus);
       }
 
       function removePendingReq() {
@@ -15651,7 +15731,7 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
       var jsonpDone = jsonpReq(url, callbackPath, function(status, text) {
         // jsonpReq only ever sets status to 200 (OK), 404 (ERROR) or -1 (WAITING)
         var response = (status === 200) && callbacks.getResponse(callbackPath);
-        completeRequest(callback, status, response, '', text);
+        completeRequest(callback, status, response, '', text, 'complete');
         callbacks.removeCallback(callbackPath);
       });
     } else {
@@ -15686,18 +15766,29 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
             status,
             response,
             xhr.getAllResponseHeaders(),
-            statusText);
+            statusText,
+            'complete');
       };
 
       var requestError = function() {
         // The response is always empty
         // See https://xhr.spec.whatwg.org/#request-error-steps and https://fetch.spec.whatwg.org/#concept-network-error
-        completeRequest(callback, -1, null, null, '');
+        completeRequest(callback, -1, null, null, '', 'error');
+      };
+
+      var requestAborted = function() {
+        completeRequest(callback, -1, null, null, '', 'abort');
+      };
+
+      var requestTimeout = function() {
+        // The response is always empty
+        // See https://xhr.spec.whatwg.org/#request-error-steps and https://fetch.spec.whatwg.org/#concept-network-error
+        completeRequest(callback, -1, null, null, '', 'timeout');
       };
 
       xhr.onerror = requestError;
-      xhr.onabort = requestError;
-      xhr.ontimeout = requestError;
+      xhr.onabort = requestAborted;
+      xhr.ontimeout = requestTimeout;
 
       forEach(eventHandlers, function(value, key) {
           xhr.addEventListener(key, value);
@@ -15747,14 +15838,14 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
       }
     }
 
-    function completeRequest(callback, status, response, headersString, statusText) {
+    function completeRequest(callback, status, response, headersString, statusText, xhrStatus) {
       // cancel timeout and subsequent timeout promise resolution
       if (isDefined(timeoutId)) {
         $browserDefer.cancel(timeoutId);
       }
       jsonpDone = xhr = null;
 
-      callback(status, response, headersString, statusText);
+      callback(status, response, headersString, statusText, xhrStatus);
     }
   };
 
@@ -18380,7 +18471,7 @@ function findConstantAndWatchExpressions(ast, $filter, parentIsPure) {
       findConstantAndWatchExpressions(ast.property, $filter, astIsPure);
     }
     ast.constant = ast.object.constant && (!ast.computed || ast.property.constant);
-    ast.toWatch = [ast];
+    ast.toWatch = ast.constant ? [] : [ast];
     break;
   case AST.CallExpression:
     isStatelessFilter = ast.filter ? isStateless($filter, ast.callee.name) : false;
@@ -18389,9 +18480,7 @@ function findConstantAndWatchExpressions(ast, $filter, parentIsPure) {
     forEach(ast.arguments, function(expr) {
       findConstantAndWatchExpressions(expr, $filter, astIsPure);
       allConstants = allConstants && expr.constant;
-      if (!expr.constant) {
-        argsToWatch.push.apply(argsToWatch, expr.toWatch);
-      }
+      argsToWatch.push.apply(argsToWatch, expr.toWatch);
     });
     ast.constant = allConstants;
     ast.toWatch = isStatelessFilter ? argsToWatch : [ast];
@@ -18408,9 +18497,7 @@ function findConstantAndWatchExpressions(ast, $filter, parentIsPure) {
     forEach(ast.elements, function(expr) {
       findConstantAndWatchExpressions(expr, $filter, astIsPure);
       allConstants = allConstants && expr.constant;
-      if (!expr.constant) {
-        argsToWatch.push.apply(argsToWatch, expr.toWatch);
-      }
+      argsToWatch.push.apply(argsToWatch, expr.toWatch);
     });
     ast.constant = allConstants;
     ast.toWatch = argsToWatch;
@@ -18420,17 +18507,14 @@ function findConstantAndWatchExpressions(ast, $filter, parentIsPure) {
     argsToWatch = [];
     forEach(ast.properties, function(property) {
       findConstantAndWatchExpressions(property.value, $filter, astIsPure);
-      allConstants = allConstants && property.value.constant && !property.computed;
-      if (!property.value.constant) {
-        argsToWatch.push.apply(argsToWatch, property.value.toWatch);
-      }
+      allConstants = allConstants && property.value.constant;
+      argsToWatch.push.apply(argsToWatch, property.value.toWatch);
       if (property.computed) {
-        findConstantAndWatchExpressions(property.key, $filter, astIsPure);
-        if (!property.key.constant) {
-          argsToWatch.push.apply(argsToWatch, property.key.toWatch);
-        }
+        //`{[key]: value}` implicitly does `key.toString()` which may be non-pure
+        findConstantAndWatchExpressions(property.key, $filter, /*parentIsPure=*/false);
+        allConstants = allConstants && property.key.constant;
+        argsToWatch.push.apply(argsToWatch, property.key.toWatch);
       }
-
     });
     ast.constant = allConstants;
     ast.toWatch = argsToWatch;
@@ -26026,15 +26110,20 @@ var htmlAnchorDirective = valueFn({
  *
  * ## A note about browser compatibility
  *
- * Edge, Firefox, and Internet Explorer do not support the `details` element, it is
+ * Internet Explorer and Edge do not support the `details` element, it is
  * recommended to use {@link ng.ngShow} and {@link ng.ngHide} instead.
  *
  * @example
      <example name="ng-open">
        <file name="index.html">
-         <label>Check me check multiple: <input type="checkbox" ng-model="open"></label><br/>
+         <label>Toggle details: <input type="checkbox" ng-model="open"></label><br/>
          <details id="details" ng-open="open">
-            <summary>Show/Hide me</summary>
+            <summary>List</summary>
+            <ul>
+              <li>Apple</li>
+              <li>Orange</li>
+              <li>Durian</li>
+            </ul>
          </details>
        </file>
        <file name="protractor.js" type="protractor">
@@ -34142,7 +34231,9 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  *     more than one tracking expression value resolve to the same key. (This would mean that two distinct objects are
  *     mapped to the same DOM element, which is not possible.)
  *
- *     Note that the tracking expression must come last, after any filters, and the alias expression.
+ *     <div class="alert alert-warning">
+ *       <strong>Note:</strong> the `track by` expression must come last - after any filters, and the alias expression.
+ *     </div>
  *
  *     For example: `item in items` is equivalent to `item in items track by $id(item)`. This implies that the DOM elements
  *     will be associated by item identity in the array.
@@ -36859,11 +36950,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":20}],22:[function(require,module,exports){
+},{"./angular":21}],23:[function(require,module,exports){
 /**
  * An abstraction for slicing an arraybuffer even when
  * ArrayBuffer.prototype.slice is not supported
@@ -36894,7 +36985,7 @@ module.exports = function(arraybuffer, start, end) {
   return result.buffer;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 
 /**
  * Expose `Backoff`.
@@ -36981,7 +37072,7 @@ Backoff.prototype.setJitter = function(jitter){
 };
 
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*
  * base64-arraybuffer
  * https://github.com/niklasvh/base64-arraybuffer
@@ -37050,7 +37141,7 @@ Backoff.prototype.setJitter = function(jitter){
   };
 })();
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 /**
  * Create a blob builder even when vendor prefixes exist
@@ -37151,9 +37242,9 @@ module.exports = (function() {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],26:[function(require,module,exports){
-
 },{}],27:[function(require,module,exports){
+
+},{}],28:[function(require,module,exports){
 /**
  * Slice reference.
  */
@@ -37178,7 +37269,7 @@ module.exports = function(obj, fn){
   }
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -37344,7 +37435,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 
 module.exports = function(a, b){
   var fn = function(){};
@@ -37352,11 +37443,11 @@ module.exports = function(a, b){
   a.prototype = new fn;
   a.prototype.constructor = a;
 };
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 
 module.exports = require('./lib/index');
 
-},{"./lib/index":31}],31:[function(require,module,exports){
+},{"./lib/index":32}],32:[function(require,module,exports){
 
 module.exports = require('./socket');
 
@@ -37368,7 +37459,7 @@ module.exports = require('./socket');
  */
 module.exports.parser = require('engine.io-parser');
 
-},{"./socket":32,"engine.io-parser":44}],32:[function(require,module,exports){
+},{"./socket":33,"engine.io-parser":45}],33:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -38111,7 +38202,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./transport":33,"./transports/index":34,"component-emitter":40,"debug":41,"engine.io-parser":44,"indexof":48,"parsejson":51,"parseqs":52,"parseuri":53}],33:[function(require,module,exports){
+},{"./transport":34,"./transports/index":35,"component-emitter":41,"debug":42,"engine.io-parser":45,"indexof":49,"parsejson":52,"parseqs":53,"parseuri":54}],34:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -38270,7 +38361,7 @@ Transport.prototype.onClose = function () {
   this.emit('close');
 };
 
-},{"component-emitter":40,"engine.io-parser":44}],34:[function(require,module,exports){
+},{"component-emitter":41,"engine.io-parser":45}],35:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies
@@ -38328,7 +38419,7 @@ function polling (opts) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./polling-jsonp":35,"./polling-xhr":36,"./websocket":38,"xmlhttprequest-ssl":39}],35:[function(require,module,exports){
+},{"./polling-jsonp":36,"./polling-xhr":37,"./websocket":39,"xmlhttprequest-ssl":40}],36:[function(require,module,exports){
 (function (global){
 
 /**
@@ -38564,7 +38655,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./polling":37,"component-inherit":29}],36:[function(require,module,exports){
+},{"./polling":38,"component-inherit":30}],37:[function(require,module,exports){
 (function (global){
 /**
  * Module requirements.
@@ -38993,7 +39084,7 @@ function unloadHandler () {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./polling":37,"component-emitter":40,"component-inherit":29,"debug":41,"xmlhttprequest-ssl":39}],37:[function(require,module,exports){
+},{"./polling":38,"component-emitter":41,"component-inherit":30,"debug":42,"xmlhttprequest-ssl":40}],38:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -39240,7 +39331,7 @@ Polling.prototype.uri = function () {
   return schema + '://' + (ipv6 ? '[' + this.hostname + ']' : this.hostname) + port + this.path + query;
 };
 
-},{"../transport":33,"component-inherit":29,"debug":41,"engine.io-parser":44,"parseqs":52,"xmlhttprequest-ssl":39,"yeast":72}],38:[function(require,module,exports){
+},{"../transport":34,"component-inherit":30,"debug":42,"engine.io-parser":45,"parseqs":53,"xmlhttprequest-ssl":40,"yeast":73}],39:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -39530,7 +39621,7 @@ WS.prototype.check = function () {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"../transport":33,"component-inherit":29,"debug":41,"engine.io-parser":44,"parseqs":52,"ws":26,"yeast":72}],39:[function(require,module,exports){
+},{"../transport":34,"component-inherit":30,"debug":42,"engine.io-parser":45,"parseqs":53,"ws":27,"yeast":73}],40:[function(require,module,exports){
 (function (global){
 // browser shim for xmlhttprequest module
 
@@ -39572,7 +39663,7 @@ module.exports = function (opts) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"has-cors":47}],40:[function(require,module,exports){
+},{"has-cors":48}],41:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -39737,7 +39828,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (process){
 
 /**
@@ -39919,7 +40010,7 @@ function localstorage(){
 
 }).call(this,require('_process'))
 
-},{"./debug":42,"_process":54}],42:[function(require,module,exports){
+},{"./debug":43,"_process":55}],43:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -40121,7 +40212,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":43}],43:[function(require,module,exports){
+},{"ms":44}],44:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -40272,7 +40363,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's'
 }
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -40886,7 +40977,7 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./keys":45,"after":15,"arraybuffer.slice":22,"base64-arraybuffer":24,"blob":25,"has-binary":46,"wtf-8":71}],45:[function(require,module,exports){
+},{"./keys":46,"after":16,"arraybuffer.slice":23,"base64-arraybuffer":25,"blob":26,"has-binary":47,"wtf-8":72}],46:[function(require,module,exports){
 
 /**
  * Gets the keys for an object.
@@ -40907,7 +40998,7 @@ module.exports = Object.keys || function keys (obj){
   return arr;
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (global){
 
 /*
@@ -40971,7 +41062,7 @@ function hasBinary(data) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"isarray":49}],47:[function(require,module,exports){
+},{"isarray":50}],48:[function(require,module,exports){
 
 /**
  * Module exports.
@@ -40990,7 +41081,7 @@ try {
   module.exports = false;
 }
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -41001,12 +41092,12 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 (function (global){
 /*! JSON v3.3.2 | http://bestiejs.github.io/json3 | Copyright 2012-2014, Kit Cambridge | http://kit.mit-license.org */
 ;(function () {
@@ -41913,7 +42004,7 @@ module.exports = Array.isArray || function (arr) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 (function (global){
 /**
  * JSON parse.
@@ -41949,7 +42040,7 @@ module.exports = function parsejson(data) {
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 /**
  * Compiles a querystring
  * Returns string representation of the object
@@ -41988,7 +42079,7 @@ exports.decode = function(qs){
   return qry;
 };
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * Parses an URI
  *
@@ -42029,7 +42120,7 @@ module.exports = function parseuri(str) {
     return uri;
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -42215,7 +42306,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -42326,7 +42417,7 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./manager":56,"./socket":58,"./url":59,"debug":61,"socket.io-parser":65}],56:[function(require,module,exports){
+},{"./manager":57,"./socket":59,"./url":60,"debug":62,"socket.io-parser":66}],57:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -42888,7 +42979,7 @@ Manager.prototype.onreconnect = function () {
   this.emitAll('reconnect', attempt);
 };
 
-},{"./on":57,"./socket":58,"backo2":23,"component-bind":27,"component-emitter":60,"debug":61,"engine.io-client":30,"indexof":48,"socket.io-parser":65}],57:[function(require,module,exports){
+},{"./on":58,"./socket":59,"backo2":24,"component-bind":28,"component-emitter":61,"debug":62,"engine.io-client":31,"indexof":49,"socket.io-parser":66}],58:[function(require,module,exports){
 
 /**
  * Module exports.
@@ -42914,7 +43005,7 @@ function on (obj, ev, fn) {
   };
 }
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -43335,7 +43426,7 @@ Socket.prototype.compress = function (compress) {
   return this;
 };
 
-},{"./on":57,"component-bind":27,"component-emitter":60,"debug":61,"has-binary":46,"socket.io-parser":65,"to-array":70}],59:[function(require,module,exports){
+},{"./on":58,"component-bind":28,"component-emitter":61,"debug":62,"has-binary":47,"socket.io-parser":66,"to-array":71}],60:[function(require,module,exports){
 (function (global){
 
 /**
@@ -43415,9 +43506,9 @@ function url (uri, loc) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"debug":61,"parseuri":53}],60:[function(require,module,exports){
-arguments[4][40][0].apply(exports,arguments)
-},{"dup":40}],61:[function(require,module,exports){
+},{"debug":62,"parseuri":54}],61:[function(require,module,exports){
+arguments[4][41][0].apply(exports,arguments)
+},{"dup":41}],62:[function(require,module,exports){
 (function (process){
 
 /**
@@ -43599,11 +43690,11 @@ function localstorage(){
 
 }).call(this,require('_process'))
 
-},{"./debug":62,"_process":54}],62:[function(require,module,exports){
-arguments[4][42][0].apply(exports,arguments)
-},{"dup":42,"ms":63}],63:[function(require,module,exports){
+},{"./debug":63,"_process":55}],63:[function(require,module,exports){
 arguments[4][43][0].apply(exports,arguments)
-},{"dup":43}],64:[function(require,module,exports){
+},{"dup":43,"ms":64}],64:[function(require,module,exports){
+arguments[4][44][0].apply(exports,arguments)
+},{"dup":44}],65:[function(require,module,exports){
 (function (global){
 /*global Blob,File*/
 
@@ -43749,7 +43840,7 @@ exports.removeBlobs = function(data, callback) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./is-buffer":66,"isarray":49}],65:[function(require,module,exports){
+},{"./is-buffer":67,"isarray":50}],66:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -44155,7 +44246,7 @@ function error(data){
   };
 }
 
-},{"./binary":64,"./is-buffer":66,"component-emitter":28,"debug":67,"json3":50}],66:[function(require,module,exports){
+},{"./binary":65,"./is-buffer":67,"component-emitter":29,"debug":68,"json3":51}],67:[function(require,module,exports){
 (function (global){
 
 module.exports = isBuf;
@@ -44173,7 +44264,7 @@ function isBuf(obj) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -44343,7 +44434,7 @@ function localstorage(){
   } catch (e) {}
 }
 
-},{"./debug":68}],68:[function(require,module,exports){
+},{"./debug":69}],69:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -44542,7 +44633,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":69}],69:[function(require,module,exports){
+},{"ms":70}],70:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -44669,7 +44760,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 module.exports = toArray
 
 function toArray(list, index) {
@@ -44684,7 +44775,7 @@ function toArray(list, index) {
     return array
 }
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/wtf8 v1.0.0 by @mathias */
 ;(function(root) {
@@ -44923,7 +45014,7 @@ function toArray(list, index) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 'use strict';
 
 var alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_'.split('')

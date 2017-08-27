@@ -15,7 +15,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var assign = require('lodash.assign');
 var less = require('gulp-less');
 var path = require('path');
-
+var templateCache = require('gulp-angular-templatecache');
 
 var runSequence = require('run-sequence');
 
@@ -102,8 +102,6 @@ gulp.task('copy', function (callback) {
 		'node_modules/bootstrap/dist/js/bootstrap.min.js',
 		'node_modules/bootstrap/dist/css/bootstrap.min.css',
 		'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
-		'app/game.html',
-		'app/login/login.template.html',
 		'app/sprites/**/*',
 		'app/sounds/**/*'
 	];
@@ -114,8 +112,6 @@ gulp.task('copy', function (callback) {
 		'js/',
 		'css/',
 		'css/',
-		'app/',
-		'app/login/',
 		'img',
 		'sounds'
 	]
@@ -134,6 +130,14 @@ gulp.task('copy', function (callback) {
 	.pipe(gp_uglify())
 	.pipe(gulp.dest('build'));
 });*/
+
+//templates
+gulp.task('templates', function(callback) {
+	console.log('Running templates!');	
+	return gulp.src('./app/**/*.html')
+		.pipe(templateCache({ standalone: true}))
+		.pipe(gulp.dest('./app'));
+});
 
 //Styles Task
 gulp.task('styles', function () {
@@ -154,14 +158,16 @@ gulp.task('lint', function () {
 //Watch Task
 //Watches JS
 gulp.task('watch', function () {
-	gulp.watch('app/js/*.js', ['scripts', 'lint']);
+	gulp.watch('app/**/*.html', ['templates', 'browserify']);
+	//gulp.watch('app/js/*.js', ['scripts', 'lint']);
 });
 
 
 gulp.task('default', function (callback) {
-	runSequence('clean', 'lint', 'copy', 'browserifyUglify', 'styles', callback);
+	runSequence('clean', 'lint', 'copy', 'templates', 'browserifyUglify', 'styles', callback);
 });
 
 gulp.task('dev', function (callback) {
-	runSequence('clean', 'lint', 'copy', 'browserify', 'styles', callback);
+	callback = callback || function () {};
+	runSequence('clean', 'lint', 'copy', 'templates', 'browserify', 'styles', 'watch', callback);
 });

@@ -13,10 +13,12 @@ import playerFactoryModule from './player.factory.js';
 import gameStateServiceModule from './game-state.service.js';
 import gameStatesConstantModule from './game-states.constant.js';
 
-
-
+//cached html templates
+import './templates.js';
 
 export default angular.module('appModule', [
+	'templates',
+
 	angularResourceModule,
 
 	appConfigModule.name,

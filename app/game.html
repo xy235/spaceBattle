@@ -27,9 +27,13 @@
 
 
 	<div ng-show="vm.name!=' '">
-		<div class=col-xs-6>
-			<h1>Game</h1>
+		<div ng-class="{'col-xs-6': !vm.isMobile"}>
+			<h1 ng-if="!vm.isMobile">Game</h1>
 			<div style="border: 1px solid black; width: 100%" id="gameCanvas"></div>
+		</div>
+		<div ng-if="vm.isMobile">
+			<button><</button>
+			<button>></button>
 		</div>
 
 		<div ng-if="!vm.isMobile" class=col-xs-6>

@@ -6,10 +6,10 @@ export default angular.module('appRoutesModule', ['ngRoute'])
     'use strict';
     $routeProvider
     .when('/game', {
-        templateUrl: 'app/game.html'
+        templateUrl: 'game.html'
       })
     .when('/login', {
-      templateUrl: 'app/login/login.template.html'
+      templateUrl: 'login/login.template.html'
     })
       .otherwise({
         redirectTo: '/'

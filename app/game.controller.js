@@ -84,6 +84,10 @@ function GameController($window, $scope, $http, pha, socket, playerFactory, game
     //game size
     vm.game.world.setBounds(0, 0, 1920, 1080);
 
+    //if(vm.isMobile) {
+      initMobile();
+    //}
+
     //config
     vm.game.time.advancedTiming = true;
 
@@ -115,6 +119,15 @@ function GameController($window, $scope, $http, pha, socket, playerFactory, game
     //game state
     gameStateService.init(vm.game);
     vm.gameObjects.gameStateText = gameStateService.gameStateText;
+  }
+
+  function initMobile() {
+    //game scale
+    // make the game occuppy all available space, but respecting
+    // aspect ratio – with letterboxing if needed
+    vm.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    vm.game.scale.pageAlignHorizontally = true;
+    vm.game.scale.pageAlignVertically = true;
   }
 
   function update() {
